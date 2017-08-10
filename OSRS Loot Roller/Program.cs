@@ -8,38 +8,54 @@ namespace OSRS_Loot_Roller
     {
         static List<Item> lootTable = new List<Item>(); //Stores the item
         static string itemToRoll = ""; // The item the user wants to roll for
-        static bool found = false; // Have we found the item yet?
+        static bool obtained = false; // Have we obtained the item yet?
         static int numberOfTries = 0; // The current number of rolls
-        static int randomNumber = 0;
+        static int randomNumber = 0; // Used as the upper limit for a random number generation
 
         // Add all of the items and their drop rates to lootTable
         static void initializeLootTable()
         {
             lootTable.Add(new Item("Ranger Boots", 293));
+            lootTable.Add(new Item("Third Age Platebody", 42140));
+            lootTable.Add(new Item("Armadyl Hilt", 508));
         }
 
+        // Used to ask the user if they want to roll again, handles accepting their response
         static void askReroll()
         {
-            Console.WriteLine("Would you like to try again? [y/n]");
+            Console.WriteLine("Would you like to roll for a new item? [y/n]");
             String rollAgain = Console.ReadLine();
             if (rollAgain.Equals("y", StringComparison.OrdinalIgnoreCase) || rollAgain.Equals("yes", StringComparison.OrdinalIgnoreCase))
             {
+                // Reset all of the fields so that the statistics remain correct
                 itemToRoll = "";
-                found = false;
+                obtained = false;
                 numberOfTries = 0;
                 randomNumber = 0;
                 runRoller();
             }
-            else return;
+            else if (rollAgain.Equals("n", StringComparison.OrdinalIgnoreCase) || rollAgain.Equals("no", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+            else
+            {
+                // If the user didn't produce a valid response, ask again.
+                askReroll();
+            }
         }
 
-        // Generate a random roll until we get the item we want
+        // Processes "itemToProcess", which is the item that the user chose to roll for.
         static void processItemToRoll(Item itemToProcess)
         {
+            // Create a new random number ranging from 1 -> the items drop rate
             Random rndNum = new Random();
             randomNumber = rndNum.Next(1, itemToProcess.DropRate);
-            while (!found)
+            // Generates a new random number and increases the number of tries until the magic number is rolled.
+            while (!obtained)
             {
+                // The magic number is just the drop rate of the item. If the random number is the drop rate, the item is obtained.
+                // Otherwise, we try again.
                 if(randomNumber != itemToProcess.DropRate)
                 {
                     numberOfTries++;
@@ -49,9 +65,10 @@ namespace OSRS_Loot_Roller
                 else
                 {
                     Console.WriteLine($"Got {itemToProcess.Name}! It took " + (numberOfTries + 1) + " clues!");
-                    found = true;
+                    obtained = true;
                 }
             }
+            // After the item is obtained, ask the user if they want to try again
             askReroll();
         }
 
@@ -61,19 +78,22 @@ namespace OSRS_Loot_Roller
             Console.WriteLine("Type /list for a list of all possible items.");
             itemToRoll = Console.ReadLine();
 
+            // This allows the user to see every available item to roll
             if (itemToRoll.Equals("/list"))
             {
                 foreach (Item item in lootTable)
                 {
-                    Console.WriteLine(item);
+                    Console.WriteLine(item.Name);
                 }
-                return;
+                askReroll();
             }
-            if (!lootTable.Any(item => item.Name.Equals(itemToRoll, StringComparison.OrdinalIgnoreCase)))
+            // If the item the user wants to roll for isn't in the list, let them know
+            else if (!lootTable.Any(item => item.Name.Equals(itemToRoll, StringComparison.OrdinalIgnoreCase)))
             {
                 Console.WriteLine("That item is not in the loot table, would you like to try a different item?");
                 askReroll();
             }
+            // Otherwise, find the item in the list, and start rolling for it, using its drop rate
             else
             {
                 foreach (Item item in lootTable)
