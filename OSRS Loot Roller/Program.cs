@@ -15,9 +15,9 @@ namespace OSRS_Loot_Roller
         // Add all of the items and their drop rates to lootTable
         static void initializeLootTable()
         {
-            lootTable.Add(new Item("Ranger Boots", 293));
-            lootTable.Add(new Item("Third Age Platebody", 42140));
-            lootTable.Add(new Item("Armadyl Hilt", 508));
+            lootTable.Add(new Item("Ranger Boots", 293, "clue"));
+            lootTable.Add(new Item("Third Age Platebody", 42140, "clue"));
+            lootTable.Add(new Item("Armadyl Hilt", 508, "kill"));
         }
 
         // Used to ask the user if they want to roll again, handles accepting their response
@@ -56,7 +56,7 @@ namespace OSRS_Loot_Roller
             {
                 // The magic number is just the drop rate of the item. If the random number is the drop rate, the item is obtained.
                 // Otherwise, we try again.
-                if(randomNumber != itemToProcess.DropRate)
+                if (randomNumber != itemToProcess.DropRate)
                 {
                     numberOfTries++;
                     Console.WriteLine($"Rolling for {itemToProcess.Name}, current dry streak: " + numberOfTries);
@@ -64,7 +64,7 @@ namespace OSRS_Loot_Roller
                 }
                 else
                 {
-                    Console.WriteLine($"Got {itemToProcess.Name}! It took " + (numberOfTries + 1) + " clues!");
+                    Console.WriteLine($"Got {itemToProcess.Name}! It took " + (numberOfTries + 1) + $" {itemToProcess.Type}s!");
                     obtained = true;
                 }
             }

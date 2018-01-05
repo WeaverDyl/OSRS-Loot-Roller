@@ -10,11 +10,13 @@ namespace OSRS_Loot_Roller
     {
         private string name;
         private int dropRate;
+        private string type; // Specified how the item is obtained (through a clue / killing a monster)
 
-        public Item(string name, int dropRate)
+        public Item(string name, int dropRate, string type)
         {
             this.name = name;
             this.dropRate = dropRate;
+            this.type = type;
         }
 
         public string Name
@@ -27,6 +29,12 @@ namespace OSRS_Loot_Roller
         {
             get { return this.dropRate; }
             set { this.dropRate = value; }
+        }
+
+        public string Type
+        {
+            get { return this.type; }
+            set { this.type = value; }
         }
     }
 }
